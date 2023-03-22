@@ -1,3 +1,3 @@
-import start from './server'
+import app from './app'
 
-start()
+app()
