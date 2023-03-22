@@ -10,7 +10,7 @@ services:
       - .:/app/
       - /app/node_modules
     ports:
-      - '3333:3333'
+      - '${PORT}:${PORT}'
     depends_on:
       - postgres
 
