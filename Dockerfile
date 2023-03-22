@@ -7,7 +7,7 @@ COPY prisma ./prisma/
 
 RUN apt-get -qy update && apt-get -qy install openssl
 
-RUN yarn --prod
+RUN yarn
 
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
