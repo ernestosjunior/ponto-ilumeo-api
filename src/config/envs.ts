@@ -2,7 +2,7 @@ import { config } from 'dotenv'
 import { expand } from 'dotenv-expand'
 
 export const loadEnvs = () => {
-  const path = process.env.NODE_ENV === 'production' ? '.env' : '.env.development'
+  const path = '.env'
 
   console.log(`🌟 Loaded enviroments from ${path}`)
 

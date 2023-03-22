@@ -1,7 +1,5 @@
 FROM node:18
 
-ENV NODE_ENV development
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -9,17 +7,17 @@ COPY prisma ./prisma/
 
 RUN apt-get -qy update && apt-get -qy install openssl
 
-RUN yarn 
-
-COPY . .
+RUN yarn --prod
 
 RUN npx prisma generate --schema ./prisma/schema.prisma
 
+COPY . .
+
+RUN yarn build
+
 EXPOSE 3333
 
-CMD yarn dev
-
-
+CMD ["/bin/bash","/app/entrypoint.sh"]
 
 
 
