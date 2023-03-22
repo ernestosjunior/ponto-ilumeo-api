@@ -24,9 +24,12 @@ export const create = async (req: Request, res: Response) => {
   }
 }
 
-export const get = async (req: Request, res: Response) => {
+export const getByCode = async (req: Request, res: Response) => {
+  const params = z.object({ code: z.string() })
   try {
-    const collaborators = await prismaClient.collaborator.findMany()
+    const { code } = params.parse(req.params)
+
+    const collaborators = await prismaClient.collaborator.findMany({ where: { code }, include: { registers: true } })
 
     return res.status(OK).json({ message: 'OK', data: collaborators })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

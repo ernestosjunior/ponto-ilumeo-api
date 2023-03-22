@@ -24,9 +24,10 @@ model Collaborator {
 }
 
 model Register {
-  id        String   @id @default(uuid())
-  entryHour DateTime
-  exitHour  DateTime
+  id        String  @id @default(uuid())
+  date      String
+  entryHour String
+  exitHour  String?
 
   collaborator   Collaborator? @relation(fields: [collaboratorId], references: [id])
   collaboratorId String?
