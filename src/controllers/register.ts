@@ -28,16 +28,15 @@ export const create = async (req: Request, res: Response) => {
       })
 
       return res.status(CREATED).json({ message: 'CREATED', data: entry })
-    } else if (register && !register.exitHour) {
-      const exit = await prismaClient.register.update({
-        where: { id: register.id },
-        data: { exitHour: currentHour }
-      })
-
-      return res.status(CREATED).json({ message: 'CREATED', data: exit })
     }
 
-    return res.status(BAD_REQUEST).json({ message: 'BAD_REQUEST', description: 'Finalized daily point' })
+    const exit = await prismaClient.register.update({
+      where: { id: register.id },
+      data: { exitHour: currentHour }
+    })
+
+    return res.status(CREATED).json({ message: 'CREATED', data: exit })
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return res.status(BAD_GATEWAY).json({ message: 'BAD_GATWAY', description: error.message })
