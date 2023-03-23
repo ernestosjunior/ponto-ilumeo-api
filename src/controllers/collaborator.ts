@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import * as z from 'zod'
 import { prismaClient } from '../config'
 import { generateCode } from '../utils/generateCode'
-import { BAD_GATEWAY, BAD_REQUEST, CREATED } from 'http-status'
+import { BAD_GATEWAY, BAD_REQUEST, CREATED, OK } from 'http-status'
 
 export const create = async (req: Request, res: Response) => {
   const createBody = z.object({ name: z.string().optional() })
@@ -23,6 +23,25 @@ export const create = async (req: Request, res: Response) => {
     })
 
     return res.status(CREATED).json({ message: 'CREATED', data: user })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return res.status(BAD_GATEWAY).json({ message: 'BAD_GATWAY', description: error.message })
+  }
+}
+
+export const getByCode = async (req: Request, res: Response) => {
+  const params = z.object({ code: z.string() })
+  try {
+    const { code } = params.parse(req.params)
+
+    const collaborators = await prismaClient.collaborator.findFirst({
+      where: { code }
+    })
+
+    if (!collaborators)
+      return res.status(BAD_REQUEST).json({ message: 'BAD_REQUEST', description: 'Collaborator not found' })
+
+    return res.status(OK).json({ message: 'OK', data: collaborators })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return res.status(BAD_GATEWAY).json({ message: 'BAD_GATWAY', description: error.message })
