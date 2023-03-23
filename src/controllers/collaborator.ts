@@ -12,10 +12,15 @@ export const create = async (req: Request, res: Response) => {
     const { name } = createBody.parse(req.body)
 
     if (!code) {
-      return res.status(BAD_REQUEST).json({ message: 'BAD_REQUEST', description: 'Generic. Repeat request.' })
+      return res.status(BAD_REQUEST).json({
+        message: 'BAD_REQUEST',
+        description: 'Generic. Repeat request.'
+      })
     }
 
-    const user = await prismaClient.collaborator.create({ data: { name, code } })
+    const user = await prismaClient.collaborator.create({
+      data: { name, code }
+    })
 
     return res.status(CREATED).json({ message: 'CREATED', data: user })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,9 +34,15 @@ export const getByCode = async (req: Request, res: Response) => {
   try {
     const { code } = params.parse(req.params)
 
-    const collaborators = await prismaClient.collaborator.findMany({ where: { code }, include: { registers: true } })
+    const collaborators = await prismaClient.collaborator.findFirst({
+      where: { code },
+      include: { registers: { orderBy: { createdAt: 'desc' } } }
+    })
 
-    return res.status(OK).json({ message: 'OK', data: collaborators })
+    const current = collaborators?.registers.at(0)
+    const others = collaborators?.registers?.slice(1)
+
+    return res.status(OK).json({ message: 'OK', data: { ...collaborators, registers: { current, others } } })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return res.status(BAD_GATEWAY).json({ message: 'BAD_GATWAY', description: error.message })
