@@ -43,3 +43,30 @@ export const create = async (req: Request, res: Response) => {
     return res.status(BAD_GATEWAY).json({ message: 'BAD_GATWAY', description: error.message })
   }
 }
+
+export const getByCode = async (req: Request, res: Response) => {
+  const params = z.object({ code: z.string() })
+  try {
+    const { code } = params.parse(req.params)
+
+    const collaborators = await prismaClient.collaborator.findFirst({
+      where: { code },
+      include: { registers: { orderBy: { createdAt: 'desc' } } }
+    })
+
+    if (!collaborators)
+      return res.status(BAD_REQUEST).json({ message: 'BAD_REQUEST', description: 'Collaborator not found' })
+
+    const [currentDate] = getCurrentDate()
+
+    const currentRegister = collaborators.registers.at(0)
+    const shouldReturnCurrent = currentRegister?.date === currentDate
+    const current = shouldReturnCurrent ? currentRegister : {}
+    const others = collaborators.registers.slice(shouldReturnCurrent ? 1 : 0)
+
+    return res.status(OK).json({ message: 'OK', data: { ...collaborators, registers: { current, others } } })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    return res.status(BAD_GATEWAY).json({ message: 'BAD_GATWAY', description: error.message })
+  }
+}
