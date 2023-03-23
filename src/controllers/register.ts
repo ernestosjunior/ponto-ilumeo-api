@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import * as z from 'zod'
 import { prismaClient } from '../config'
 import { BAD_GATEWAY, BAD_REQUEST, CREATED, OK } from 'http-status'
-import moment from 'moment'
+import { getCurrentDate } from '../utils/getCurrentDate'
 
 export const create = async (req: Request, res: Response) => {
   const createBody = z.object({ code: z.string() })
@@ -14,7 +14,7 @@ export const create = async (req: Request, res: Response) => {
 
     if (!user) return res.status(BAD_REQUEST).json({ message: 'BAD_REQUEST', description: 'Collaborator not found.' })
 
-    const [currentDate, currentHour] = moment().format('DD/MM/YYYY HH:mm:ss').split(' ')
+    const [currentDate, currentHour] = getCurrentDate()
 
     const query = await prismaClient.register.findMany({
       where: { collaboratorId: user.id, date: { equals: currentDate } }

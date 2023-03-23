@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import * as z from 'zod'
 import { prismaClient } from '../config'
 import { generateCode } from '../utils/generateCode'
+import { getCurrentDate } from '../utils/getCurrentDate'
 import { BAD_GATEWAY, BAD_REQUEST, CREATED, OK } from 'http-status'
 
 export const create = async (req: Request, res: Response) => {
@@ -39,8 +40,12 @@ export const getByCode = async (req: Request, res: Response) => {
       include: { registers: { orderBy: { createdAt: 'desc' } } }
     })
 
-    const current = collaborators?.registers.at(0)
-    const others = collaborators?.registers?.slice(1)
+    const [currentDate] = getCurrentDate()
+
+    const currentRegister = collaborators?.registers.at(0)
+    const shouldReturnCurrent = currentRegister?.date === currentDate
+    const current = shouldReturnCurrent ? currentRegister : {}
+    const others = collaborators?.registers?.slice(shouldReturnCurrent ? 1 : 0)
 
     return res.status(OK).json({ message: 'OK', data: { ...collaborators, registers: { current, others } } })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
