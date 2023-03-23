@@ -37,7 +37,7 @@ export const create = async (req: Request, res: Response) => {
       return res.status(CREATED).json({ message: 'CREATED', data: exit })
     }
 
-    return res.status(OK).json({ message: 'OK', description: 'Finalized daily point' })
+    return res.status(BAD_REQUEST).json({ message: 'BAD_REQUEST', description: 'Finalized daily point' })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return res.status(BAD_GATEWAY).json({ message: 'BAD_GATWAY', description: error.message })
